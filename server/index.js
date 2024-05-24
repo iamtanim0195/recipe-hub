@@ -1,24 +1,23 @@
-const express = require('express');
-const app = express();
-require('dotenv').config();
-const cors = require('cors');
-const cookieParser = require('cookie-parser');
-const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
-const jwt = require('jsonwebtoken');
-const morgan = require('morgan');
-const port = process.env.PORT || 8000;
-const uri = process.env.DB_URI;
-const stripe = require('stripe')(process.env.PAYMENT_SECRET_KEY);
+const express = require('express')
+const app = express()
+require('dotenv').config()
+const cors = require('cors')
+const cookieParser = require('cookie-parser')
+const { MongoClient, ServerApiVersion } = require('mongodb')
+const jwt = require('jsonwebtoken')
+const morgan = require('morgan')
+const port = process.env.PORT || 8000
+
 // middleware
 const corsOptions = {
     origin: ['http://localhost:5173', 'http://localhost:5174'],
-
+    credentials: true,
     optionSuccessStatus: 200,
 }
-app.use(cors(corsOptions));
-app.use(express.json());
-app.use(cookieParser());
-app.use(morgan('dev'));
+app.use(cors(corsOptions))
+app.use(express.json())
+app.use(cookieParser())
+app.use(morgan('dev'))
 const verifyToken = async (req, res, next) => {
     const token = req.cookies?.token
     console.log(token)
@@ -34,16 +33,19 @@ const verifyToken = async (req, res, next) => {
         next()
     })
 }
-const client = new MongoClient(uri, {
+
+const client = new MongoClient(process.env.DB_URI, {
     serverApi: {
         version: ServerApiVersion.v1,
         strict: true,
         deprecationErrors: true,
-    }
-});
+    },
+})
 async function run() {
     try {
-        const usersCollection = client.db('recipe-hub').collection('users');
+        //DB collection
+        const usersCollection = client.db("recipeHub").collection("users");
+        // auth related api
         app.post('/jwt', async (req, res) => {
             const user = req.body
             console.log('I need a new jwt', user)
@@ -87,69 +89,29 @@ async function run() {
             const result = await usersCollection.updateOne(
                 query,
                 {
-                    $set: { ...user, timestamp: Date.now() },
+                    $set: { ...user},
                 },
                 options
             )
-            console.log(result);
-            res.send(result)
-        })
-        //get role
-        app.get('/users/:email', async (req, res) => {
-            const email = req.params.email
-            const result = await usersCollection.findOne({ email })
-            res.send(result)
-        })
-
-        app.post('/create-payment-intent', verifyToken, async (req, res) => {
-            const { price } = req.body;
-            const amount = parseInt(price * 100);
-
-            if (!price || amount < 1) return
-            const { client_secret } = await stripe.paymentIntents.create({
-                amount: amount,
-                currency: 'usd',
-                payment_method_types: ['card'],
-            })
-            res.send({ clientSecret: client_secret });
-        });
-
-        // users
-        app.get('/users', verifyToken, async (req, res) => {
-            const result = await usersCollection.find().toArray()
-            res.send(result);
-        })
-        //update user role
-        app.put('/users/update/:email', verifyToken, async (req, res) => {
-            const email = req.params.email;
-            const user = req.body;
-            const query = { email: email }
-            const options = { upsert: true }
-            const updateDoc = {
-                $set: {
-                    ...user, timestamp: Date.now(),
-                }
-            }
-            const result = await usersCollection.updateOne(query, updateDoc, options)
             res.send(result)
         })
 
         // Send a ping to confirm a successful connection
         await client.db('admin').command({ ping: 1 })
         console.log(
-            'Pinged your deployment.You successfully connected to MongoDB!'
+            'Pinged your deployment. You successfully connected to MongoDB!'
         )
     } finally {
         // Ensures that the client will close when you finish/error
-        await client.close();
+        // await client.close();
     }
 }
 run().catch(console.dir)
 
 app.get('/', (req, res) => {
-    res.send('Hello from recipe hub Server..')
+    res.send('Hello from recipeHub Server..')
 })
 
 app.listen(port, () => {
-    console.log(`recipe hub is running on port ${port}`)
+    console.log(`RecipeHub is running on port ${port}`)
 })

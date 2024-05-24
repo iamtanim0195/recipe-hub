@@ -9,7 +9,8 @@ import { getToken, saveUser } from '../../../../api/auth';
 const MenuDropdown = () => {
     const navigate = useNavigate();
     const location = useLocation();
-    const { signIn, signInWithGoogle, loading, setLoading } = useAuth();
+    console.log(location?.state?.pathname)
+    const { signInWithGoogle } = useAuth();
     const from = location?.state?.pathname || '/'
     const [isOpen, setIsOpen] = useState(false)
     const { user, logOut } = useAuth()
@@ -26,7 +27,6 @@ const MenuDropdown = () => {
         } catch (error) {
             console.log(error)
             toast.error(error?.message);
-
         }
     }
     return (
@@ -44,7 +44,13 @@ const MenuDropdown = () => {
                             Recipes
                         </button>
                     </Link>
-                    {user ? <> </> : <>
+                    {user ? <>
+                        <Link to="/add-recipes">
+                            <button className='disabled:cursor-not-allowed cursor-pointer hover:bg-neutral-100 py-3 px-4 text-sm font-semibold rounded-full  transition'>
+                                Add Recipes
+                            </button>
+                        </Link>
+                    </> : <>
 
                         <button onClick={handelGoogleSignin} className='disabled:cursor-not-allowed cursor-pointer hover:bg-neutral-100 py-3 px-4 text-sm font-semibold rounded-full  transition'>
                             Continue with Google
@@ -57,7 +63,7 @@ const MenuDropdown = () => {
                     onClick={() => setIsOpen(!isOpen)}
                     className='p-4 md:py-1 md:px-2 border-[1px] border-neutral-200 flex flex-row items-center gap-3 rounded-full cursor-pointer hover:shadow-md transition'
                 >
-                    
+
                     <div className=''>
                         {/* Avatar */}
                         <img

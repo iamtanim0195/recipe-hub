@@ -3,6 +3,8 @@ import Main from "../layouts/Main";
 import ErrorPage from "../pages/ErrorPage";
 import Home from "../pages/Home/Home";
 import Recipes from "../pages/Recipes/Recipes";
+import PrivateRoute from "./PrivateRoute";
+import AddRecipes from "../pages/AddRecipes/AddRecipes";
 
 export const router = createBrowserRouter([
     {
@@ -17,6 +19,14 @@ export const router = createBrowserRouter([
             {
                 path: "/recipes",
                 element: <Recipes />,
+            },
+            {
+                path: "/add-recipes",
+                element: (
+                    <PrivateRoute>
+                        <AddRecipes />
+                    </PrivateRoute>
+                ),
             },
         ]
     }
