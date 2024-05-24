@@ -1,13 +1,34 @@
 import { AiOutlineMenu } from 'react-icons/ai'
 import { useState } from 'react'
-import { Link } from 'react-router-dom'
-/* import useAuth from '../../../hooks/useAuth'
- */import avatarImg from '../../../../assets/images/placeholder.jpg'
+import { Link, useLocation, useNavigate } from 'react-router-dom'
+import useAuth from '../../../../hooks/useAuth'
+import avatarImg from '../../../../assets/images/placeholder.jpg'
+import toast from 'react-hot-toast';
+import { getToken, saveUser } from '../../../../api/auth';
 
 const MenuDropdown = () => {
+    const navigate = useNavigate();
+    const location = useLocation();
+    const { signIn, signInWithGoogle, loading, setLoading } = useAuth();
+    const from = location?.state?.pathname || '/'
     const [isOpen, setIsOpen] = useState(false)
-    /* const { user, logOut } = useAuth() */
-    const user = false;
+    const { user, logOut } = useAuth()
+    //handle google sign
+    const handelGoogleSignin = async () => {
+        try {
+            const result = await signInWithGoogle()
+            const dbResponse = await saveUser(result?.user)
+            console.log(dbResponse)
+
+            await getToken(result?.user?.email)
+            toast.success("SignUp is successful");
+            navigate(from, { replace: true });
+        } catch (error) {
+            console.log(error)
+            toast.error(error?.message);
+
+        }
+    }
     return (
         <div className='relative'>
             <div className='flex flex-row items-center gap-3'>
@@ -24,11 +45,11 @@ const MenuDropdown = () => {
                         </button>
                     </Link>
                     {user ? <> </> : <>
-                        <Link to="/login">
-                            <button className='disabled:cursor-not-allowed cursor-pointer hover:bg-neutral-100 py-3 px-4 text-sm font-semibold rounded-full  transition'>
-                                Google Login
-                            </button>
-                        </Link></>}
+
+                        <button onClick={handelGoogleSignin} className='disabled:cursor-not-allowed cursor-pointer hover:bg-neutral-100 py-3 px-4 text-sm font-semibold rounded-full  transition'>
+                            Continue with Google
+                        </button>
+                    </>}
 
                 </div>
                 {/* Dropdown btn */}
@@ -36,8 +57,8 @@ const MenuDropdown = () => {
                     onClick={() => setIsOpen(!isOpen)}
                     className='p-4 md:py-1 md:px-2 border-[1px] border-neutral-200 flex flex-row items-center gap-3 rounded-full cursor-pointer hover:shadow-md transition'
                 >
-                    <AiOutlineMenu />
-                    <div className='hidden md:block'>
+                    
+                    <div className=''>
                         {/* Avatar */}
                         <img
                             className='rounded-full'
@@ -80,17 +101,17 @@ const MenuDropdown = () => {
                                 Dashboard
                             </Link>
                             <div
-                                /* onClick={logOut} */
+                                onClick={logOut}
                                 className='px-4 py-3 hover:bg-neutral-100 transition font-semibold cursor-pointer'
                             >
                                 LogOut
                             </div></> : <>
                             {user ? <> </> : <>
-                                <Link to="/joinUs">
-                                    <button className=' block md:hidden disabled:cursor-not-allowed cursor-pointer hover:bg-neutral-100 py-3 px-4 text-sm font-semibold rounded-full  transition'>
+
+                                <button onClick={handelGoogleSignin} className=' block md:hidden disabled:cursor-not-allowed cursor-pointer hover:bg-neutral-100 py-3 px-4 text-sm font-semibold rounded-full  transition'>
                                     Google Login
-                                    </button>
-                                </Link></>}
+                                </button>
+                            </>}
                         </>}
                     </div>
                 </div>

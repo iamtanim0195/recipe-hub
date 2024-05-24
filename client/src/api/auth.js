@@ -3,10 +3,7 @@ import axiosSecure from ".";
 export const saveUser = async user => {
     const currentUser = {
         email: user.email,
-        role: 'student',
-        badge: 'bronze',
-        package: 'nan',
-        status: 'Verified',
+        coin: 50,
     }
     const { data } = await axiosSecure.put(`/users/:${user?.email}`, currentUser)
     return data
