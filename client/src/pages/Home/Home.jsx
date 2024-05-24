@@ -1,7 +1,13 @@
+import Banner from "./Banner/Banner"
+import SuccessStories from "./SuccessStories/SuccessStories"
+
 
 const Home = () => {
     return (
-        <div>Home</div>
+        <div>
+            <Banner />
+            <SuccessStories />
+        </div>
     )
 }
 
