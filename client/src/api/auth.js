@@ -7,7 +7,7 @@ export const saveUser = async user => {
         email: user.email,
         coin: 50,
     }
-    const { data } = await axiosSecure.put(`/users/:${user?.email}`, currentUser)
+    const { data } = await axiosSecure.put(`/users/${user?.email}`, currentUser)
     return data
 }
 //get token form server

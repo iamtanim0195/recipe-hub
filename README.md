@@ -5,3 +5,4 @@
 3. npm i react-icons
 4. npm i dotenv
 5. npm install firebase
+6. npm install antd --save

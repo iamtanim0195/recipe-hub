@@ -5,7 +5,7 @@ import useAuth from '../../../../hooks/useAuth'
 import avatarImg from '../../../../assets/images/placeholder.jpg'
 import toast from 'react-hot-toast';
 import { getToken, saveUser } from '../../../../api/auth';
-
+import { GiTwoCoins } from "react-icons/gi";
 const MenuDropdown = () => {
     const navigate = useNavigate();
     const location = useLocation();
@@ -39,7 +39,7 @@ const MenuDropdown = () => {
                             Home
                         </button>
                     </Link>
-                    <Link to="/meals">
+                    <Link to="/recipes">
                         <button className='disabled:cursor-not-allowed cursor-pointer hover:bg-neutral-100 py-3 px-4 text-sm font-semibold rounded-full  transition'>
                             Recipes
                         </button>
@@ -48,6 +48,13 @@ const MenuDropdown = () => {
                         <Link to="/add-recipes">
                             <button className='disabled:cursor-not-allowed cursor-pointer hover:bg-neutral-100 py-3 px-4 text-sm font-semibold rounded-full  transition'>
                                 Add Recipes
+                            </button>
+                        </Link>
+                        <Link to="/add-recipes">
+                            <button className='disabled:cursor-not-allowed cursor-pointer hover:bg-neutral-100 py-3 px-4 text-sm font-semibold rounded-full  transition'>
+                                <div className='flex gap-1'>
+                                    Coin 50 <GiTwoCoins />
+                                </div>
                             </button>
                         </Link>
                     </> : <>

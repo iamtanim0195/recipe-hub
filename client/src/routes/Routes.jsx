@@ -5,6 +5,7 @@ import Home from "../pages/Home/Home";
 import Recipes from "../pages/Recipes/Recipes";
 import PrivateRoute from "./PrivateRoute";
 import AddRecipes from "../pages/AddRecipes/AddRecipes";
+import { getAllRecipes } from "../api/recipes";
 
 export const router = createBrowserRouter([
     {
@@ -19,6 +20,7 @@ export const router = createBrowserRouter([
             {
                 path: "/recipes",
                 element: <Recipes />,
+                loader: () => getAllRecipes(),
             },
             {
                 path: "/add-recipes",

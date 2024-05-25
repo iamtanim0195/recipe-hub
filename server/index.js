@@ -3,7 +3,7 @@ const app = express()
 require('dotenv').config()
 const cors = require('cors')
 const cookieParser = require('cookie-parser')
-const { MongoClient, ServerApiVersion } = require('mongodb')
+const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb')
 const jwt = require('jsonwebtoken')
 const morgan = require('morgan')
 const port = process.env.PORT || 8000
@@ -45,6 +45,7 @@ async function run() {
     try {
         //DB collection
         const usersCollection = client.db("recipeHub").collection("users");
+        const recipeCollection = client.db("recipeHub").collection("recipes");
         // auth related api
         app.post('/jwt', async (req, res) => {
             const user = req.body
@@ -89,13 +90,29 @@ async function run() {
             const result = await usersCollection.updateOne(
                 query,
                 {
-                    $set: { ...user},
+                    $set: { ...user },
                 },
                 options
             )
             res.send(result)
         })
-
+        // save recipe to database
+        app.post('/recipes', verifyToken, async (req, res) => {
+            const recipe = req.body
+            const result = await recipeCollection.insertOne(recipe)
+            res.send(result)
+        })
+        //Get all recipes
+        app.get('/recipes', verifyToken, async (req, res) => {
+            const result = await recipeCollection.find({}).toArray()
+            res.send(result)
+        })
+        //Get single recipe by id
+        app.get('/recipes/:id', async (req, res) => {
+            const id = req.params.id
+            const result = await recipeCollection.findOne({ _id: new ObjectId(id) })
+            res.send(result)
+        })
         // Send a ping to confirm a successful connection
         await client.db('admin').command({ ping: 1 })
         console.log(
