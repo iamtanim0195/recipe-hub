@@ -11,7 +11,7 @@ const Banner = () => {
                 <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold">Connect with the cooking community</h1>
                 <p className="mt-4 italic text-lg md:text-2xl lg:text-3xl">Get inspired and connect with other home cooks like you</p>
                 <div className='flex gap-3 p-2'>
-                    <Link to={'/recipes'} className="btn btn-success">See recipes</Link>
+                    <Link to={`/recipes`} className="btn btn-success">See recipes</Link>
                     <Link to={'/add-recipes'} className="btn btn-warning">Add recipes</Link>
                 </div>
             </div>

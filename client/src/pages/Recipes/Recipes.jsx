@@ -1,14 +1,28 @@
-import { useLoaderData } from "react-router-dom"
+import { useLoaderData } from "react-router-dom";
+import useAuth from "../../hooks/useAuth";
+import toast from "react-hot-toast";
 
 const Recipes = () => {
+    const { user } = useAuth()
     const recipes = useLoaderData();
     console.log(recipes);
+
+    //vew recipe button action
+    const vewRecipe = () => {
+        if (!user) {
+            toast.error('Please login to view the recipe');
+        }
+        if (user.email == recipes.creatorEmail) {
+            toast.error('kam sairafelso');
+        }
+
+    }
     return (
         <div className="container mx-auto p-4">
             <h1 className="text-3xl font-bold mb-6">Recipes</h1>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {recipes.map(recipe => (
-                    <div key={recipe.id} className="card w-96 bg-base-100 shadow-xl">
+                    <div key={recipe.id} className="card mx-auto w-60 sm:w-80 lg:w-96 bg-base-100 shadow-xl">
                         <figure className="px-10 pt-10">
                             <img
                                 src={recipe?.thumbnail}
@@ -31,7 +45,7 @@ const Recipes = () => {
                             )}
                             <p>Country: {recipe?.Country}</p>
                             <div className="card-actions">
-                                <button className="btn btn-primary">View The Recipe</button>
+                                <button onClick={vewRecipe} className="btn btn-primary">View The Recipe</button>
                             </div>
                         </div>
                     </div>

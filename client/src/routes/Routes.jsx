@@ -5,7 +5,11 @@ import Home from "../pages/Home/Home";
 import Recipes from "../pages/Recipes/Recipes";
 import PrivateRoute from "./PrivateRoute";
 import AddRecipes from "../pages/AddRecipes/AddRecipes";
-import { getAllRecipes } from "../api/recipes";
+import { getAllRecipes, getRecipe } from "../api/recipes";
+import { getUserByEmail } from "../api/auth";
+import useAuth from "../hooks/useAuth";
+import RecipeDetails from "../pages/Recipes/RecipeDetails";
+
 
 export const router = createBrowserRouter([
     {
@@ -20,7 +24,16 @@ export const router = createBrowserRouter([
             {
                 path: "/recipes",
                 element: <Recipes />,
-                loader: () => getAllRecipes(),
+                loader: async () => await getAllRecipes(),
+            },
+            {
+                path: "/recipes/:id",
+                element: (
+                    <PrivateRoute>
+                        <RecipeDetails />
+                    </PrivateRoute>
+                ),
+                loader: ({ params }) => getRecipe(params.id),
             },
             {
                 path: "/add-recipes",

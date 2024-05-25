@@ -96,6 +96,12 @@ async function run() {
             )
             res.send(result)
         })
+        // Get user by email
+        app.get('/users/:email', async (req, res) => {
+            const email = req.params.email
+            const result = await usersCollection.findOne({email})
+            res.send(result)
+        })
         // save recipe to database
         app.post('/recipes', verifyToken, async (req, res) => {
             const recipe = req.body
@@ -103,7 +109,7 @@ async function run() {
             res.send(result)
         })
         //Get all recipes
-        app.get('/recipes', verifyToken, async (req, res) => {
+        app.get('/recipes', async (req, res) => {
             const result = await recipeCollection.find({}).toArray()
             res.send(result)
         })
