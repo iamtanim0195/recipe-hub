@@ -7,7 +7,7 @@ const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb')
 const jwt = require('jsonwebtoken')
 const morgan = require('morgan')
 const port = process.env.PORT || 8000
-
+const stripe = require('stripe')(process.env.PAYMENT_SECRET_KEY)
 // middleware
 const corsOptions = {
     origin: ['http://localhost:5173', 'http://localhost:5174'],
@@ -99,7 +99,7 @@ async function run() {
         // Get user by email
         app.get('/users/:email', async (req, res) => {
             const email = req.params.email
-            const result = await usersCollection.findOne({email})
+            const result = await usersCollection.findOne({ email })
             res.send(result)
         })
         // save recipe to database
@@ -117,6 +117,32 @@ async function run() {
         app.get('/recipes/:id', async (req, res) => {
             const id = req.params.id
             const result = await recipeCollection.findOne({ _id: new ObjectId(id) })
+            res.send(result)
+        })
+        // Generate client secret for stripe payment
+        app.post('/create-payment-intent', verifyToken, async (req, res) => {
+            const { price } = req.body
+            const amount = parseInt(price * 100)
+            if (!price || amount < 1) return
+            const { client_secret } = await stripe.paymentIntents.create({
+                amount: amount,
+                currency: 'usd',
+                payment_method_types: ['card'],
+            })
+            res.send({ clientSecret: client_secret })
+        })
+
+        // Update user coin
+        app.patch('/users/coin/:email', async (req, res) => {
+            const email = req.params.email
+            const coin = req.body.coin
+            const query = { email: email }
+            const updateDoc = {
+                $set: {
+                    coin: coin,
+                },
+            }
+            const result = await usersCollection.updateOne(query, updateDoc)
             res.send(result)
         })
         // Send a ping to confirm a successful connection

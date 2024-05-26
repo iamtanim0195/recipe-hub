@@ -3,9 +3,16 @@ import { getUserByEmail } from "../../api/auth";
 import toast from "react-hot-toast";
 import useAuth from "../../hooks/useAuth";
 import { GiTwoCoins } from "react-icons/gi";
+import { coinData } from "./CoinData";
+import BookingModal from "../../components/Modal/BookingModal";
 
 const Coin = () => {
     const [dbUser, setDbUser] = useState(null);
+    const [isOpen, setIsOpen] = useState(false);
+    const [bookingInfo, setBookingInfo] = useState('');
+    const closeModal = () => {
+        setIsOpen(false);
+    }
     const { user } = useAuth();
     useEffect(() => {
         const fetchDbUser = async () => {
@@ -26,24 +33,12 @@ const Coin = () => {
     if (!user) {
         return <p>Loading user...</p>;
     }
-    const coinData = [
-        {
-            metal: "silver",
-            coin: 100,
-            dollar: 1
-        },
-        {
-            metal: "gold",
-            coin: 500,
-            dollar: 5
-        },
-        {
-            metal: "platinum",
-            coin: 1000,
-            dollar: 10
-        }
-    ];
-
+    const byCoin = (label) => {
+        setIsOpen(true);
+        const BookingCoin = coinData.find(coin => coin.label === label);
+        console.log(BookingCoin);
+        setBookingInfo(BookingCoin);
+    }
 
     return (
         <div>
@@ -58,7 +53,7 @@ const Coin = () => {
 
             <div className="grid gap-3 grid-cols-1 sm:grid-cols-2 md:grid-cols-3 p-5">
                 {coinData.map((item, index) => (
-                    <div key={index} className="card mx-auto w-60 p-5 bg-green-400 shadow-xl text-center hover:bg-green-500 transition duration-300">
+                    <div onClick={() => byCoin(item.label)} key={index} className="card mx-auto w-60 p-5 bg-green-400 shadow-xl text-center hover:bg-green-500 transition duration-300">
                         <div className="flex gap-3 justify-center">
                             <p className="text-2xl">{item.coin}</p>
                             <p className="text-2xl"><GiTwoCoins /></p>
@@ -67,7 +62,7 @@ const Coin = () => {
                     </div>
                 ))}
             </div>
-
+            <BookingModal closeModal={closeModal} isOpen={isOpen} bookingInfo={bookingInfo} />
         </div>
     );
 };
