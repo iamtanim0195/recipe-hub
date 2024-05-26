@@ -50,7 +50,7 @@ const MenuDropdown = () => {
                                 Add Recipes
                             </button>
                         </Link>
-                        <Link to="/add-recipes">
+                        <Link to="/coin">
                             <button className='disabled:cursor-not-allowed cursor-pointer hover:bg-neutral-100 py-3 px-4 text-sm font-semibold rounded-full  transition'>
                                 <div className='flex gap-1'>
                                     Coin 50 <GiTwoCoins />
@@ -94,16 +94,23 @@ const MenuDropdown = () => {
                             Home
                         </Link>
                         <Link
-                            to='/'
+                            to='/recipes'
                             className='block md:hidden px-4 py-3 hover:bg-neutral-100 transition font-semibold'
                         >
                             Recipes
                         </Link>
                         <Link
-                            to='/'
+                            to="/add-recipes"
                             className='block md:hidden px-4 py-3 hover:bg-neutral-100 transition font-semibold'
                         >
                             Add-recipes
+                        </Link>
+                        <Link to="/coin">
+                            <button className='disabled:cursor-not-allowed cursor-pointer hover:bg-neutral-100 py-3 px-4 text-sm font-semibold rounded-full  transition'>
+                                <div className='flex gap-1'>
+                                    Coin 50 <GiTwoCoins />
+                                </div>
+                            </button>
                         </Link>
                         {user ? <>
                             <h1 className='text-2xl p-2'>{user.displayName}</h1>

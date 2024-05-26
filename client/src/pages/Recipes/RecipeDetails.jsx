@@ -15,7 +15,7 @@ const RecipeDetails = () => {
                     title="Embedded YouTube Video"
                 ></iframe>
             </div>
-            <div className="p-3 ">
+            <div className="p-3">
                 <p> <span className="font-semibold">Recipe Name:</span> {RecipeName}</p>
                 <p> <span className="font-semibold">Recipe Details:</span> {RecipeDetails} </p>
                 <p> <span className="font-semibold">Creator Email:</span>  {creatorEmail}</p>

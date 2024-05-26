@@ -9,6 +9,8 @@ import { getAllRecipes, getRecipe } from "../api/recipes";
 import { getUserByEmail } from "../api/auth";
 import useAuth from "../hooks/useAuth";
 import RecipeDetails from "../pages/Recipes/RecipeDetails";
+import PrivateRecipe from "./PrivateRecipe";
+import Coin from "../pages/Coin/Coin";
 
 
 export const router = createBrowserRouter([
@@ -27,11 +29,15 @@ export const router = createBrowserRouter([
                 loader: async () => await getAllRecipes(),
             },
             {
+                path: "/coin",
+                element: <Coin />,
+            },
+            {
                 path: "/recipes/:id",
                 element: (
-                    <PrivateRoute>
+                    <PrivateRecipe>
                         <RecipeDetails />
-                    </PrivateRoute>
+                    </PrivateRecipe>
                 ),
                 loader: ({ params }) => getRecipe(params.id)
             },

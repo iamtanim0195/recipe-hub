@@ -1,22 +1,31 @@
-import { Link, useLoaderData } from "react-router-dom";
-import useAuth from "../../hooks/useAuth";
+import { useNavigate, useLoaderData } from "react-router-dom";
 import toast from "react-hot-toast";
+import useAuth from "../../hooks/useAuth";
+import { getRecipe } from "../../api/recipes";
+import { getUserByEmail } from "../../api/auth";
 
 const Recipes = () => {
-    const { user } = useAuth()
     const recipes = useLoaderData();
-    console.log(recipes);
+    const { user } = useAuth();
+    const navigate = useNavigate();
 
-    //vew recipe button action
-    const vewRecipe = () => {
+    const vewRecipe = async (id) => {
+        console.log(id);
         if (!user) {
-            toast.error('Please login to view the recipe');
+            return toast.error("You are not logged in");
         }
-        if (user.email == recipes.creatorEmail) {
-            toast.error('kam sairafelso');
+        const recipe = await getRecipe(id);
+        if (recipe.creatorEmail === user.email) {
+            navigate(`/recipes/${id}`);
+        }
+        const dbUser = await getUserByEmail(user.email);
+        if (user && dbUser.coin < 10) {
+            navigate(`/coin`);
+            return alert('Please buy a coin');
         }
 
-    }
+    };
+
     return (
         <div className="container mx-auto p-4">
             <h1 className="text-3xl font-bold mb-6">Recipes</h1>
@@ -44,15 +53,17 @@ const Recipes = () => {
                                 <></>
                             )}
                             <p>Country: {recipe?.Country}</p>
-                            <div className="card-actions">
-                                <Link to={`/recipes/${recipe?._id}`} onClick={vewRecipe} className="btn btn-primary">View The Recipe</Link>
+                            <div>
+                                <button onClick={() => vewRecipe(recipe._id)} className="btn btn-primary">
+                                    View The Recipe
+                                </button>
                             </div>
                         </div>
                     </div>
                 ))}
             </div>
         </div>
-    )
+    );
 }
 
-export default Recipes
+export default Recipes;
