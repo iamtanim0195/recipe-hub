@@ -9,9 +9,9 @@ import { GiTwoCoins } from "react-icons/gi";
 const MenuDropdown = () => {
     const navigate = useNavigate();
     const location = useLocation();
-    console.log(location?.pathname)
+    console.log(location.state?.from?.pathname)
     const { signInWithGoogle } = useAuth();
-    const from = location?.pathname || '/'
+    const from = location.state?.from?.pathname || '/'
     const [isOpen, setIsOpen] = useState(false)
     const { user, logOut } = useAuth()
     //handle google sign

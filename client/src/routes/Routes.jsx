@@ -33,7 +33,7 @@ export const router = createBrowserRouter([
                         <RecipeDetails />
                     </PrivateRoute>
                 ),
-                loader: ({ params }) => getRecipe(params.id),
+                loader: ({ params }) => getRecipe(params.id)
             },
             {
                 path: "/add-recipes",
