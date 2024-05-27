@@ -1,10 +1,10 @@
 import { AiOutlineMenu } from 'react-icons/ai'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import useAuth from '../../../../hooks/useAuth'
 import avatarImg from '../../../../assets/images/placeholder.jpg'
 import toast from 'react-hot-toast';
-import { getToken, saveUser } from '../../../../api/auth';
+import { getToken, getUserByEmail, saveUser } from '../../../../api/auth';
 import { GiTwoCoins } from "react-icons/gi";
 const MenuDropdown = () => {
     const navigate = useNavigate();
@@ -14,6 +14,25 @@ const MenuDropdown = () => {
     const from = location.state?.from?.pathname || '/'
     const [isOpen, setIsOpen] = useState(false)
     const { user, logOut } = useAuth()
+    const [dbUser, setDbUser] = useState('');
+    const [loading, setLoading] = useState(true);
+    useEffect(() => {
+        const fetchDbUser = async () => {
+            if (user && user.email) {
+                try {
+                    const userData = await getUserByEmail(user.email);
+                    setDbUser(userData);
+                } catch (error) {
+                    console.error("Error fetching user data:", error);
+                    toast.error("Failed to fetch user data.");
+                } finally {
+                    setLoading(false);
+                }
+            }
+        };
+        fetchDbUser();
+    }, [user]);
+
     //handle google sign
     const handelGoogleSignin = async () => {
         try {
@@ -53,7 +72,7 @@ const MenuDropdown = () => {
                         <Link to="/coin">
                             <button className='disabled:cursor-not-allowed cursor-pointer hover:bg-neutral-100 py-3 px-4 text-sm font-semibold rounded-full  transition'>
                                 <div className='flex gap-1'>
-                                    Coin 50 <GiTwoCoins />
+                                    Coin {dbUser.coin} <GiTwoCoins />
                                 </div>
                             </button>
                         </Link>
@@ -108,7 +127,7 @@ const MenuDropdown = () => {
                         <Link to="/coin">
                             <button className='disabled:cursor-not-allowed cursor-pointer hover:bg-neutral-100 py-3 px-4 text-sm font-semibold rounded-full  transition'>
                                 <div className='flex gap-1'>
-                                    Coin 50 <GiTwoCoins />
+                                    Coin {dbUser.coin} <GiTwoCoins />
                                 </div>
                             </button>
                         </Link>

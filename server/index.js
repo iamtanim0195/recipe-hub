@@ -119,6 +119,40 @@ async function run() {
             const result = await recipeCollection.findOne({ _id: new ObjectId(id) })
             res.send(result)
         })
+        // update recipe
+        app.put('/recipes/:id', verifyToken, async (req, res) => {
+            const id = req.params.id;
+            const updatedRecipe = req.body;
+            const query = { _id: new ObjectId(id) };
+            const updateDoc = {
+                $set: updatedRecipe,
+            };
+            try {
+                const result = await recipeCollection.updateOne(query, updateDoc);
+                res.send(result);
+            } catch (error) {
+                console.error('Error updating recipe:', error);
+                res.status(500).send({ message: 'Failed to update recipe' });
+            }
+        });
+        // Update like status of a recipe
+        app.patch('/recipes/:id/like', async (req, res) => {
+            const id = req.params.id;
+            const { liked } = req.body;
+            const query = { _id: new ObjectId(id) };
+            const updateDoc = {
+                $set: { liked: liked }
+            };
+            try {
+                const result = await recipeCollection.updateOne(query, updateDoc);
+                res.send(result);
+            } catch (error) {
+                console.error('Error updating like status:', error);
+                res.status(500).send({ message: 'Failed to update like status' });
+            }
+        });
+
+
         // Generate client secret for stripe payment
         app.post('/create-payment-intent', async (req, res) => {
             const { price } = req.body
@@ -137,11 +171,9 @@ async function run() {
             const email = req.params.email
             const coin = req.body.coin
             const query = { email: email }
-            const findCoin = await usersCollection.findOne(query)
-            const updateCoin = findCoin.coin + coin
             const updateDoc = {
                 $set: {
-                    coin: updateCoin,
+                    coin: coin,
                 },
             }
             const result = await usersCollection.updateOne(query, updateDoc)

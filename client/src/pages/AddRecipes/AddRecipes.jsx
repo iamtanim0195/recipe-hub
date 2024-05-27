@@ -90,7 +90,7 @@ const AddRecipes = () => {
                     const recipeData = await addRecipe(recipes)
                     toast.success("Recipes added successfully")
                     console.log(recipeData);
-                    setRecipes('');
+                    window.location.reload();
                 } catch (error) {
                     console.log(error);
                     toast.error("Recipes added failed");
@@ -166,10 +166,11 @@ const AddRecipes = () => {
                                 placeholder="Enter Country "
                             />
                             <select onChange={handleInputChange}
-                                name="Category " className="select focus:border-white bg-pink-600 px-4 py-2 w-[40vw] rounded-md text-white placeholder:text-yellow-50">
-                                <option selected>Breakfast</option>
-                                <option>Lunch</option>
-                                <option>Dinner</option>
+                                name="Category" className="select focus:border-white bg-pink-600 px-4 py-2 w-[40vw] rounded-md text-white placeholder:text-yellow-50">
+                                <option >Category</option>
+                                <option value="Breakfast">Breakfast</option>
+                                <option value="Lunch">Lunch</option>
+                                <option value="Dinner">Dinner</option>
                             </select>
                         </div>
                     </form>

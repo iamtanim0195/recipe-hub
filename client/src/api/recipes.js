@@ -16,3 +16,24 @@ export const addRecipe = async (recipeData) => {
     const { data } = await axiosSecure.post("/recipes", recipeData)
     return data;
 };
+// Update the recipe data
+export const updateRecipe = async (id, updatedRecipe) => {
+    try {
+        const { data } = await axiosSecure.put(`/recipes/${id}`, updatedRecipe);
+        return data;
+    } catch (error) {
+        console.error('Error updating recipe:', error);
+        throw error;
+    }
+};
+
+// Update like status of a recipe
+export const updateLikeStatus = async (id, liked) => {
+    try {
+        const { data } = await axiosSecure.patch(`/recipes/${id}/like`, { liked });
+        return data;
+    } catch (error) {
+        console.error('Error updating like status:', error);
+        throw error;
+    }
+};

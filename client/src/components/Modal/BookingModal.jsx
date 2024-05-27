@@ -1,7 +1,6 @@
 import { Dialog, Transition } from '@headlessui/react'
 import { Elements } from '@stripe/react-stripe-js'
-import { format } from 'date-fns'
-import { Fragment, useState } from 'react'
+import { Fragment} from 'react'
 import CheckoutForm from '../Form/CheckoutForm'
 import { loadStripe } from '@stripe/stripe-js'
 const BookingModal = ({ closeModal, isOpen, bookingInfo }) => {

@@ -1,27 +1,24 @@
 import { useEffect, useState } from 'react';
 import {
-    PaymentElement,
-    Elements,
     useStripe,
     useElements,
     CardElement,
 } from '@stripe/react-stripe-js';
-import { createPaymentIntent, updateUserCoin } from '../../api/bookings';
+import { updateUserCoin } from '../../api/bookings';
 import useAuth from '../../hooks/useAuth';
 import toast from 'react-hot-toast';
+import { getUserByEmail } from '../../api/auth';
 
 
-const CheckoutForm = ({ bookingInfo }) => {
+const CheckoutForm = ({ bookingInfo,closeModal }) => {
     const { user } = useAuth();
     const stripe = useStripe();
     const elements = useElements();
     const [clientSecret, setClientSecret] = useState('')
-
     const [errorMessage, setErrorMessage] = useState('');
     const [emailInput, setEmailInput] = useState('');
 
     console.log(bookingInfo);
-    const backendUrl = import.meta.env.VITE_STRIPE_PK_AIRCODE_URL;
 
     useEffect(() => {
         // create payment intent
@@ -71,11 +68,14 @@ const CheckoutForm = ({ bookingInfo }) => {
             console.log(paymentIntent);
             if (paymentIntent.status === 'succeeded') {
                 toast.success('Payment Successful');
-                const coinUpdate = await updateUserCoin(user.email, bookingInfo.coin);
+                const dbUser = await getUserByEmail(user.email);
+                const coinUpdate = await updateUserCoin(user.email, dbUser.coin + bookingInfo.coin);
                 console.log(coinUpdate);
+                closeModal();
             }
         } catch (error) {
             console.log(error);
+            toast.error(error.message);
         }
 
     };
