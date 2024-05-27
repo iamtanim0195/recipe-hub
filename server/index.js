@@ -127,13 +127,18 @@ async function run() {
         // update recipe
         app.put('/recipes/:id', verifyToken, async (req, res) => {
             const id = req.params.id;
-            const updatedRecipe = req.body;
+            const email = req.body.email;
+            console.log(email);
             const query = { _id: new ObjectId(id) };
             const updateDoc = {
-                $set: updatedRecipe,
+                $push : { purchased_by: email},
             };
-            try {
+            
+            try { 
                 const result = await recipeCollection.updateOne(query, updateDoc);
+                const findWatchCount = await recipeCollection.findOne({ _id: new ObjectId(id) });
+                const PlusWatchCount = findWatchCount.watchCount + 1;
+                const updateWatchCount = await recipeCollection.updateOne({ _id: new ObjectId(id) }, { $set: { watchCount: PlusWatchCount } });
                 res.send(result);
             } catch (error) {
                 console.error('Error updating recipe:', error);

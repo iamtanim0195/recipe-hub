@@ -48,6 +48,7 @@ const Recipes = () => {
         }
         try {
             const recipe = await getRecipe(id);
+            console.log(recipe);
             if (recipe.creatorEmail === user.email) {
                 return navigate(`/recipes/${id}`);
             }
@@ -55,6 +56,9 @@ const Recipes = () => {
             if (dbUser.coin < 10) {
                 navigate(`/coin`);
                 return alert('Please buy a coin');
+            }
+            if (recipe.purchased_by.find(email => email === user.email)) {
+                return navigate(`/recipes/${id}`);
             }
             if (user && recipe.creatorEmail !== user.email && dbUser.coin >= 10) {
                 const confirmSpend = window.confirm("You will spend 10 coins to view this recipe. Do you want to proceed?");
@@ -69,14 +73,13 @@ const Recipes = () => {
 
                 // Update the recipe data
                 const updatedRecipe = {
-                    ...recipe,
-                    purchased_by: [...recipe.purchased_by, user.email],
-                    watchCount: (recipe.watchCount || 0) + 1,
+                    email: user.email,
                 };
                 await updateRecipe(id, updatedRecipe);
 
                 navigate(`/recipes/${id}`);
             }
+
         } catch (error) {
             console.error("Error viewing recipe:", error);
             toast.error("An error occurred while processing your request.");
@@ -94,17 +97,17 @@ const Recipes = () => {
     return (
         <div className="container mx-auto p-4">
             <h1 className="text-3xl font-bold mb-6">Recipes</h1>
-            <div className="mb-6 flex justify-between">
+            <div className="mb-6 flex flex-wrap justify-between">
                 <div>
                     <input
                         type="text"
                         value={searchQuery}
                         onChange={handleSearchChange}
                         placeholder="Search by title..."
-                        className="input input-bordered w-60"
+                        className="input input-bordered  w-40"
                     />
                 </div>
-                <div className="space-x-4">
+                <div className="flex flex-col gap-2 md:flex-row">
                     <select value={categoryFilter} onChange={handleCategoryChange} className="select select-bordered">
                         <option value="">All Categories</option>
                         <option value="Breakfast">Breakfast</option>
@@ -116,7 +119,7 @@ const Recipes = () => {
                         value={countryFilter}
                         onChange={handleCountryChange}
                         placeholder="Search by country..."
-                        className="input input-bordered w-60"
+                        className="input input-bordered w-40"
                     />
                 </div>
             </div>
