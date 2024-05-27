@@ -12,7 +12,7 @@ axiosSecure.interceptors.response.use(response => response, async (error) => {
         error.response.status === 403
     )) {
         await clearCookie()
-        window.location.replace('/login')
+        window.location.replace('/')
     }
     return Promise.reject(error)
 })

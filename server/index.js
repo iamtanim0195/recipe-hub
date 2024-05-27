@@ -102,6 +102,11 @@ async function run() {
             const result = await usersCollection.findOne({ email })
             res.send(result)
         })
+        // Get all users 
+        app.get('/users', async (req, res) => {
+            const result = await usersCollection.find({}).toArray()
+            res.send(result)
+        })
         // save recipe to database
         app.post('/recipes', verifyToken, async (req, res) => {
             const recipe = req.body
