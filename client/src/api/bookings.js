@@ -8,7 +8,6 @@ export const createPaymentIntent = async price => {
 
 // update user coin
 export const updateUserCoin = async (email, coin) => {
-    const { data } = await axiosSecure.patch(`/users/coin/${email}`, {coin})
+    const { data } = await axiosSecure.patch(`/users/coin/${email}`, { coin })
     return data
- 
 }

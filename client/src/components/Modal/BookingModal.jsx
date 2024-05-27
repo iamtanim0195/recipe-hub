@@ -4,9 +4,9 @@ import { format } from 'date-fns'
 import { Fragment, useState } from 'react'
 import CheckoutForm from '../Form/CheckoutForm'
 import { loadStripe } from '@stripe/stripe-js'
-const stripePromise = loadStripe(import.meta.env.VITE_Payment_Gateway_PK)
 const BookingModal = ({ closeModal, isOpen, bookingInfo }) => {
     console.log(bookingInfo);
+    const stripePromise = loadStripe(import.meta.env.VITE_Payment_Gateway_PK)
     return (
         <Transition appear show={isOpen} as={Fragment}>
             <Dialog as='div' className='relative z-10' onClose={closeModal}>
@@ -53,7 +53,7 @@ const BookingModal = ({ closeModal, isOpen, bookingInfo }) => {
                                 <hr className='mt-8 ' />
                                 {/* Card data form */}
                                 {/* checkout form */}
-                                <Elements stripe={stripePromise}>
+                                <Elements options={{ mode: 'setup', currency: 'usd' }} stripe={stripePromise}>
                                     <CheckoutForm
                                         closeModal={closeModal}
                                         bookingInfo={bookingInfo}

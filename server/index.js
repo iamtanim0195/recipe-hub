@@ -120,7 +120,7 @@ async function run() {
             res.send(result)
         })
         // Generate client secret for stripe payment
-        app.post('/create-payment-intent', verifyToken, async (req, res) => {
+        app.post('/create-payment-intent', async (req, res) => {
             const { price } = req.body
             const amount = parseInt(price * 100)
             if (!price || amount < 1) return
@@ -137,9 +137,11 @@ async function run() {
             const email = req.params.email
             const coin = req.body.coin
             const query = { email: email }
+            const findCoin = await usersCollection.findOne(query)
+            const updateCoin = findCoin.coin + coin
             const updateDoc = {
                 $set: {
-                    coin: coin,
+                    coin: updateCoin,
                 },
             }
             const result = await usersCollection.updateOne(query, updateDoc)

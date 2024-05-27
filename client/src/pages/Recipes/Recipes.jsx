@@ -1,13 +1,15 @@
-import { useNavigate, useLoaderData } from "react-router-dom";
-import toast from "react-hot-toast";
-import useAuth from "../../hooks/useAuth";
-import { getRecipe } from "../../api/recipes";
-import { getUserByEmail } from "../../api/auth";
+import React, { useState } from 'react';
+import { useNavigate, useLoaderData } from 'react-router-dom';
+import toast from 'react-hot-toast';
+import useAuth from '../../hooks/useAuth';
+import { getRecipe } from '../../api/recipes';
+import { getUserByEmail } from '../../api/auth';
 
 const Recipes = () => {
     const recipes = useLoaderData();
     const { user } = useAuth();
     const navigate = useNavigate();
+    const [searchQuery, setSearchQuery] = useState("");
 
     const vewRecipe = async (id) => {
         console.log(id);
@@ -23,14 +25,30 @@ const Recipes = () => {
             navigate(`/coin`);
             return alert('Please buy a coin');
         }
-
     };
+
+    const handleSearchChange = (e) => {
+        setSearchQuery(e.target.value);
+    };
+
+    const filteredRecipes = recipes.filter(recipe =>
+        recipe.RecipeName.toLowerCase().includes(searchQuery.toLowerCase())
+    );
 
     return (
         <div className="container mx-auto p-4">
             <h1 className="text-3xl font-bold mb-6">Recipes</h1>
+            <div className="mb-6">
+                <input
+                    type="text"
+                    value={searchQuery}
+                    onChange={handleSearchChange}
+                    placeholder="Search by title..."
+                    className="input input-bordered w-60"
+                />
+            </div>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {recipes.map(recipe => (
+                {filteredRecipes.map(recipe => (
                     <div key={recipe._id} className="card mx-auto w-60 sm:w-80 lg:w-96 bg-base-100 shadow-xl">
                         <figure className="px-10 pt-10">
                             <img
@@ -64,6 +82,6 @@ const Recipes = () => {
             </div>
         </div>
     );
-}
+};
 
 export default Recipes;

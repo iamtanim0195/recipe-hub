@@ -1,144 +1,102 @@
-import { CardElement, useElements, useStripe } from '@stripe/react-stripe-js'
-import { useEffect, useState } from 'react'
-import './CheckoutForm.css'
-import useAuth from '../../hooks/useAuth'
-import { ImSpinner9 } from 'react-icons/im'
+import { useEffect, useState } from 'react';
 import {
-    createPaymentIntent,
-    updateUserCoin,
-} from '../../api/bookings'
-import toast from 'react-hot-toast'
-import { useNavigate } from 'react-router-dom'
+    PaymentElement,
+    Elements,
+    useStripe,
+    useElements,
+    CardElement,
+} from '@stripe/react-stripe-js';
+import { createPaymentIntent, updateUserCoin } from '../../api/bookings';
+import useAuth from '../../hooks/useAuth';
+import toast from 'react-hot-toast';
 
-const CheckoutForm = ({ bookingInfo, closeModal }) => {
-    const stripe = useStripe()
-    const elements = useElements()
-    const { user } = useAuth()
-    const [cardError, setCardError] = useState('')
+
+const CheckoutForm = ({ bookingInfo }) => {
+    const { user } = useAuth();
+    const stripe = useStripe();
+    const elements = useElements();
     const [clientSecret, setClientSecret] = useState('')
-    const [processing, setProcessing] = useState(false)
-    const navigate = useNavigate()
+
+    const [errorMessage, setErrorMessage] = useState('');
+    const [emailInput, setEmailInput] = useState('');
+
+    console.log(bookingInfo);
+    const backendUrl = import.meta.env.VITE_STRIPE_PK_AIRCODE_URL;
+
     useEffect(() => {
         // create payment intent
-        if (bookingInfo.dollar > 0) {
-            createPaymentIntent({ price: bookingInfo.dollar }).then(data => {
-                console.log(data.clientSecret)
-                setClientSecret(data.clientSecret)
-            })
+        const clientSecret = async () => {
+            const response = await fetch("http://localhost:8000/create-payment-intent", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ price: 90 }),
+            });
+            const { clientSecret } = await response.json();
+            console.log(clientSecret);
+            setClientSecret(clientSecret);
         }
-    }, [bookingInfo])
+        return () => clientSecret()
 
-    const handleSubmit = async event => {
-        event.preventDefault()
-
-        if (!stripe || !elements) {
-            return
+    }, [])
+    console.log(clientSecret);
+    const handleSubmit = async (event) => {
+        event.preventDefault();
+        if (elements == null || stripe == null) {
+            return;
         }
+        const card = elements.getElement(CardElement);
+        // Trigger form validation and wallet collection
+        const { error: submitError } = await elements.submit();
 
-        const card = elements.getElement(CardElement)
-        if (card === null) {
-            return
+        if (submitError?.message) {
+            // Show error to your customer
+            setErrorMessage(submitError.message);
+            return;
         }
-
-        // Card data lookup (Asynchronous Network Call )
         const { paymentMethod, error } = await stripe.createPaymentMethod({
             type: 'card',
             card,
         })
-
-        if (error) {
-            console.log('error', error)
-            setCardError(error.message)
-        } else {
-            setCardError('')
-            console.log('payment method', paymentMethod)
-        }
-
-        setProcessing(true)
-
-        // Ekhane taka katbe
-        const { paymentIntent, error: confirmError } =
-            await stripe.confirmCardPayment(clientSecret, {
-                payment_method: {
-                    card: card,
-                    billing_details: {
-                        email: user?.email,
-                        name: user?.displayName,
+        try {
+            const { paymentIntent, error: confirmError } =
+                await stripe.confirmCardPayment(clientSecret, {
+                    payment_method: {
+                        card: card,
+                        billing_details: {
+                            email: user?.email,
+                            name: user?.displayName,
+                        },
                     },
-                },
-            })
-
-        if (confirmError) {
-            console.log(confirmError)
-            setCardError(confirmError.message)
-        }
-
-        console.log('payment intent', paymentIntent)
-
-        if (paymentIntent.status === 'succeeded') {
-            const paymentInfo = {
-                ...bookingInfo,
-                transactionId: paymentIntent.id,
-                date: new Date(),
+                })
+            console.log(paymentIntent);
+            if (paymentIntent.status === 'succeeded') {
+                toast.success('Payment Successful');
+                const coinUpdate = await updateUserCoin(user.email, bookingInfo.coin);
+                console.log(coinUpdate);
             }
-        } try {
-
-            // Update room status in db
-            await updateUserCoin(bookingInfo.coin, true)
-            const text = `Booking Successful! ${paymentIntent.id}`
-            toast.success(text)
-            navigate('/dashboard/my-bookings')
-        } catch (err) {
-            console.log(err)
-            toast.error(err.message)
-        } finally {
-            setProcessing(false)
+        } catch (error) {
+            console.log(error);
         }
-}
 
-return (
-    <>
-        <form className='my-2' onSubmit={handleSubmit}>
-            <CardElement
-                options={{
-                    style: {
-                        base: {
-                            fontSize: '16px',
-                            color: '#424770',
-                            '::placeholder': {
-                                color: '#aab7c4',
-                            },
-                        },
-                        invalid: {
-                            color: '#9e2146',
-                        },
-                    },
-                }}
-            />
-            <div className='flex mt-2 justify-around'>
-                <button
-                    type='button'
-                    className='inline-flex justify-center rounded-md border border-transparent bg-red-100 px-4 py-2 text-sm font-medium text-red-900 hover:bg-red-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-red-500 focus-visible:ring-offset-2'
-                    onClick={closeModal}
-                >
-                    Cancel
-                </button>
-                <button
-                    type='submit'
-                    disabled={!stripe || !clientSecret || processing}
-                    className='inline-flex justify-center rounded-md border border-transparent bg-green-100 px-4 py-2 text-sm font-medium text-green-900 hover:bg-green-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-green-500 focus-visible:ring-offset-2'
-                >
-                    {processing ? (
-                        <ImSpinner9 className='m-auto animate-spin' size={24} />
-                    ) : (
-                        `Pay ${bookingInfo.price}$`
-                    )}
-                </button>
+    };
+
+
+    return (
+        <form onSubmit={handleSubmit} className='px-4'>
+            <div className='mb-3'>
+                <label htmlFor="email-input">Email</label>
+                <div>
+                    <input value={emailInput} onChange={(e => setEmailInput(e.target.value))} type="email" id="email-input" placeholder='johndoe@gmail.com' />
+                </div>
             </div>
+            <CardElement />
+            <button type="submit" disabled={!stripe || !elements}>
+                Pay
+            </button>
+            {/* Show error message to your customers */}
+            {errorMessage && <div>{errorMessage}</div>}
         </form>
-        {cardError && <p className='text-red-600 ml-8'>{cardError}</p>}
-    </>
-)
-}
+    );
+};
 
-export default CheckoutForm
+export default CheckoutForm;
