@@ -18,9 +18,9 @@ const MenuDropdown = () => {
     const [loading, setLoading] = useState(true);
     useEffect(() => {
         const fetchDbUser = async () => {
-            if (user && user.email) {
+            if (user && user?.email) {
                 try {
-                    const userData = await getUserByEmail(user.email);
+                    const userData = await getUserByEmail(user?.email);
                     setDbUser(userData);
                 } catch (error) {
                     console.error("Error fetching user data:", error);
@@ -72,7 +72,7 @@ const MenuDropdown = () => {
                         <Link to="/coin">
                             <button className='disabled:cursor-not-allowed cursor-pointer hover:bg-neutral-100 py-3 px-4 text-sm font-semibold rounded-full  transition'>
                                 <div className='flex gap-1'>
-                                    Coin {dbUser.coin} <GiTwoCoins />
+                                    Coin {dbUser?.coin} <GiTwoCoins />
                                 </div>
                             </button>
                         </Link>
@@ -95,7 +95,7 @@ const MenuDropdown = () => {
                         <img
                             className='rounded-full'
                             referrerPolicy='no-referrer'
-                            src={user && user.photoURL ? user.photoURL : avatarImg}
+                            src={user && user?.photoURL ? user?.photoURL : avatarImg}
                             alt='profile'
                             height='30'
                             width='30'
@@ -133,12 +133,6 @@ const MenuDropdown = () => {
                         </Link>
                         {user ? <>
                             <h1 className='text-2xl p-2'>{user.displayName}</h1>
-                            <Link
-                                to='/dashboard'
-                                className='px-4 py-3 hover:bg-neutral-100 transition font-semibold'
-                            >
-                                Dashboard
-                            </Link>
                             <div
                                 onClick={logOut}
                                 className='px-4 py-3 hover:bg-neutral-100 transition font-semibold cursor-pointer'

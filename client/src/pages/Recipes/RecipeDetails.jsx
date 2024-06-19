@@ -8,13 +8,11 @@ const RecipeDetails = () => {
     const recipe = useLoaderData();
     const { RecipeName, Video, creatorEmail, watchCount, purchased_by, RecipeDetails, Country, _id, Category } = recipe;
     const [liked, setLiked] = useState(false);
-    const [likeCount, setLikeCount] = useState(recipe.likeCount);
     const [suggestions, setSuggestions] = useState([]);
 
     useEffect(() => {
         // Set initial like status and count
         setLiked(recipe.liked);
-        setLikeCount(recipe?.likeCount);
         // Fetch related recipes
         fetchRelatedRecipes();
     }, [recipe]);
@@ -37,8 +35,6 @@ const RecipeDetails = () => {
             setLiked(!liked);
             // Update the like status in the database
             await updateLikeStatus(_id, !liked);
-            // Update the like count if the like status changes
-            setLikeCount(prevCount => liked ? prevCount - 1 : prevCount + 1);
         } catch (error) {
             console.error('Error toggling like status:', error);
         }
@@ -81,12 +77,12 @@ const RecipeDetails = () => {
                     )}
                     <p className="ml-1 cursor-pointer" onClick={toggleLike}>{liked ? 'Unlike' : 'Like'}</p>
                 </div>
-                <p>Like Count: {likeCount}</p>
+
             </div>
             <div className="mt-6">
                 <h3 className="text-xl font-bold">Related Recipes</h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-4">
-                    {suggestions.map(suggestion => (
+                    {suggestions?.map(suggestion => (
                         <div key={suggestion._id} className="card w-full bg-base-100 shadow-xl">
                             <figure className="px-10 pt-10">
                                 <img

@@ -3,9 +3,10 @@ import { Elements } from '@stripe/react-stripe-js'
 import { Fragment} from 'react'
 import CheckoutForm from '../Form/CheckoutForm'
 import { loadStripe } from '@stripe/stripe-js'
+const stripePromise = loadStripe(import.meta.env.VITE_Payment_Gateway_PK)
+
 const BookingModal = ({ closeModal, isOpen, bookingInfo }) => {
     console.log(bookingInfo);
-    const stripePromise = loadStripe(import.meta.env.VITE_Payment_Gateway_PK)
     return (
         <Transition appear show={isOpen} as={Fragment}>
             <Dialog as='div' className='relative z-10' onClose={closeModal}>

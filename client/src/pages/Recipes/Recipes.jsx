@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { useNavigate, useLoaderData } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import useAuth from '../../hooks/useAuth';
@@ -49,23 +49,23 @@ const Recipes = () => {
         try {
             const recipe = await getRecipe(id);
             console.log(recipe);
-            if (recipe.creatorEmail === user.email) {
+            if (recipe.creatorEmail === user?.email) {
                 return navigate(`/recipes/${id}`);
             }
-            const dbUser = await getUserByEmail(user.email);
-            if (dbUser.coin < 10) {
+            const dbUser = await getUserByEmail(user?.email);
+            if (dbUser?.coin < 10) {
                 navigate(`/coin`);
                 return alert('Please buy a coin');
             }
-            if (recipe.purchased_by.find(email => email === user.email)) {
+            if (recipe.purchased_by.find(email => email === user?.email)) {
                 return navigate(`/recipes/${id}`);
             }
-            if (user && recipe.creatorEmail !== user.email && dbUser.coin >= 10) {
+            if (user && recipe.creatorEmail !== user?.email && dbUser?.coin >= 10) {
                 const confirmSpend = window.confirm("You will spend 10 coins to view this recipe. Do you want to proceed?");
                 if (!confirmSpend) return;
 
                 // Deduct 10 coins from the user
-                await updateUserCoin(user.email, dbUser.coin - 10);
+                await updateUserCoin(user?.email, dbUser?.coin - 10);
 
                 // Add 1 coin to the creator
                 const creator = await getUserByEmail(recipe.creatorEmail);
@@ -73,7 +73,7 @@ const Recipes = () => {
 
                 // Update the recipe data
                 const updatedRecipe = {
-                    email: user.email,
+                    email: user?.email,
                 };
                 await updateRecipe(id, updatedRecipe);
 
@@ -89,8 +89,8 @@ const Recipes = () => {
     const filteredRecipes = recipes.filter(recipe => {
         return (
             recipe.RecipeName.toLowerCase().includes(searchQuery.toLowerCase()) &&
-            (categoryFilter === '' || recipe.Category === categoryFilter) &&
-            (countryFilter === '' || recipe.Country.toLowerCase() === countryFilter.toLowerCase())
+            (categoryFilter === '' || recipe?.Category === categoryFilter) &&
+            (countryFilter === '' || recipe?.Country.toLowerCase() === countryFilter.toLowerCase())
         );
     });
 
@@ -131,7 +131,7 @@ const Recipes = () => {
                 endMessage={<p style={{ textAlign: 'center' }}><b>Yay! You have seen it all</b></p>}
             >
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    {filteredRecipes.map(recipe => (
+                    {filteredRecipes?.map(recipe => (
                         <div key={recipe._id} className="card mx-auto w-60 sm:w-80 lg:w-96 bg-base-100 shadow-xl">
                             <figure className="px-10 pt-10">
                                 <img

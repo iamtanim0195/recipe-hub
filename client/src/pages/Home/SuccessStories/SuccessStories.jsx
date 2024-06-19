@@ -4,8 +4,8 @@ import CountUp from 'react-countup';
 const SuccessStories = ({ allRecipes, allUsers }) => {
     const [recipesCount, setRecipesCount] = useState(0);
     const [usersCount, setUsersCount] = useState(0);
-    const AllRecipes = allRecipes.length;
-    const AllUsers = allUsers.length;
+    const AllRecipes = allRecipes?.length;
+    const AllUsers = allUsers?.length;
     // Simulated data fetching 
     useEffect(() => {
 

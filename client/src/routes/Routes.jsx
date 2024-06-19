@@ -6,8 +6,7 @@ import Recipes from "../pages/Recipes/Recipes";
 import PrivateRoute from "./PrivateRoute";
 import AddRecipes from "../pages/AddRecipes/AddRecipes";
 import { getAllRecipes, getRecipe } from "../api/recipes";
-import { getUserByEmail, getUsers } from "../api/auth";
-import useAuth from "../hooks/useAuth";
+import {  getUsers } from "../api/auth";
 import RecipeDetails from "../pages/Recipes/RecipeDetails";
 import PrivateRecipe from "./PrivateRecipe";
 import Coin from "../pages/Coin/Coin";
@@ -44,7 +43,7 @@ export const router = createBrowserRouter([
                         <RecipeDetails />
                     </PrivateRecipe>
                 ),
-                loader: ({ params }) => getRecipe(params.id)
+                loader: async ({ params }) => await getRecipe(params.id)
             },
             {
                 path: "/add-recipes",

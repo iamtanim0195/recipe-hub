@@ -10,11 +10,11 @@ const port = process.env.PORT || 8000
 const stripe = require('stripe')(process.env.PAYMENT_SECRET_KEY)
 // middleware
 const corsOptions = {
-    origin: ['http://localhost:5173', 'http://localhost:5174'],
+    origin: ['http://localhost:5173', 'https://recipehubclient.vercel.app'],
     credentials: true,
     optionSuccessStatus: 200,
-}
-app.use(cors(corsOptions))
+};
+app.use(cors(corsOptions));
 app.use(express.json())
 app.use(cookieParser())
 app.use(morgan('dev'))
@@ -41,6 +41,11 @@ const client = new MongoClient(process.env.DB_URI, {
         deprecationErrors: true,
     },
 })
+app.use(function (req, res, next) {
+    res.header("Access-Control-Allow-Origin", "https://recipehubclient.vercel.app"); // update to match the domain you will make the request from
+    res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+    next();
+});
 async function run() {
     try {
         //DB collection
@@ -108,7 +113,7 @@ async function run() {
             res.send(result)
         })
         // save recipe to database
-        app.post('/recipes', verifyToken, async (req, res) => {
+        app.post('/recipe', verifyToken, async (req, res) => {
             const recipe = req.body
             const result = await recipeCollection.insertOne(recipe)
             res.send(result)
@@ -131,10 +136,10 @@ async function run() {
             console.log(email);
             const query = { _id: new ObjectId(id) };
             const updateDoc = {
-                $push : { purchased_by: email},
+                $push: { purchased_by: email },
             };
-            
-            try { 
+
+            try {
                 const result = await recipeCollection.updateOne(query, updateDoc);
                 const findWatchCount = await recipeCollection.findOne({ _id: new ObjectId(id) });
                 const PlusWatchCount = findWatchCount.watchCount + 1;
@@ -165,17 +170,21 @@ async function run() {
 
         // Generate client secret for stripe payment
         app.post('/create-payment-intent', async (req, res) => {
-            const { price } = req.body
-            const amount = parseInt(price * 100)
-            if (!price || amount < 1) return
-            const { client_secret } = await stripe.paymentIntents.create({
-                amount: amount,
-                currency: 'usd',
-                payment_method_types: ['card'],
-            })
-            res.send({ clientSecret: client_secret })
-        })
-
+            const { amount } = req.body;
+            const paymentAmount = parseInt(amount * 100); // Convert to cents
+            if (!amount || paymentAmount < 1) return res.status(400).send({ error: 'Invalid amount' });
+            try {
+                const paymentIntent = await stripe.paymentIntents.create({
+                    amount: paymentAmount,
+                    currency: 'usd',
+                    payment_method_types: ['card'],
+                });
+                res.send({ clientSecret: paymentIntent.client_secret });
+            } catch (error) {
+                console.error('Error creating payment intent:', error);
+                res.status(500).send({ error: 'Failed to create payment intent' });
+            }
+        });
         // Update user coin
         app.patch('/users/coin/:email', async (req, res) => {
             const email = req.params.email

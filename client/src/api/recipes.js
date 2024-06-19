@@ -13,7 +13,7 @@ export const getRecipe = async (id) => {
 
 //save a recipe data in db
 export const addRecipe = async (recipeData) => {
-    const { data } = await axiosSecure.post("/recipes", recipeData)
+    const { data } = await axiosSecure.post("/recipe", recipeData)
     return data;
 };
 // Update the recipe data
